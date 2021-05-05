@@ -1,0 +1,7 @@
+auth:
+  scopedToken: CLOUDFLARE_API_KEY
+domains:
+  - name: home.matthewmeade.ca
+    type: A
+    proxied: true
+    zoneId: CLOUDFLARE_ZONE_ID

@@ -1,0 +1,61 @@
+version: "3"
+
+services:
+
+  proxy:
+    restart: always
+    image: nginx:1.17.10
+    container_name: proxy
+    depends_on:
+        - filebrowser
+    volumes:
+      - ./proxy/nginx.conf:/etc/nginx/nginx.conf
+      - ./data/public:/public:z
+    ports:
+      - 80:80
+
+  filebrowser:
+    image: hurlenko/filebrowser
+    user: "${_UID}:${_GID}"
+    container_name: filebrowser
+    volumes:
+      - ./data:/data:z
+      - ./filebrowserDB:/config
+    environment:
+      - FB_BASEURL=/filebrowser
+    restart: always
+
+  samba:
+    restart: always
+    image: dperson/samba
+    container_name: samba
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    environment:
+      TZ: "America/St_Johns"
+      NMBD: "true"
+      USER: "server;server" # Insecure password, only exposed to LAN
+      USERID: "${_UID}"
+      GROUPID: "${_GID}"
+      SHARE: "share;/data;yes;no;no;server;'none';'none';'Home Server Files"
+      RECYCLE: "" # Disable recycle bin
+      SMB: "true" # Disables SMB2 minimum version
+    ports:
+      - "137:137/udp" 
+      - "138:138/udp" 
+      - "139:139/tcp" 
+      - "445:445/tcp" 
+    read_only: false
+    tmpfs:
+      - /tmp
+    volumes:
+      - ./data:/data:z
+    command:  -p
+
+  cloudflareDDNS:
+      image: joshava/cloudflare-ddns
+      restart: always
+      container_name: cloudflareDDNS
+      volumes:
+        - ./ddns/config.yaml:/app/config.yaml
