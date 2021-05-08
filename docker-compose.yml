@@ -39,7 +39,7 @@ services:
       USERID: "${_UID}"
       GROUPID: "${_GID}"
       SHARE: "share;/data;yes;no;no;server;'none';'none';'Home Server Files"
-      RECYCLE: "" # Disable recycle bin
+      RECYCLE: "disable" # Disable recycle bin
       SMB: "true" # Disables SMB2 minimum version
     ports:
       - "137:137/udp" 
@@ -59,3 +59,22 @@ services:
       container_name: cloudflareDDNS
       volumes:
         - ./ddns/config.yaml:/app/config.yaml
+
+  handbrake:
+    image: jlesage/handbrake
+    restart: always
+    environment:
+      USER_ID: "${_UID}"
+      GROUP_ID: "${_GID}"
+      TZ: "America/St_Johns"
+      AUTOMATED_CONVERSION_KEEP_SOURCE: 0
+      AUTOMATED_CONVERSION_HANDBRAKE_CUSTOM_ARGS: "--preset-import-file /config/preset.json -Z MyPreset"
+      AUTOMATED_CONVERSION_OVERWRITE_OUTPUT: 1
+    ports:
+      - "5800:5800"
+      - "5900:5900"
+    volumes:
+      - "./handbrake:/config:rw"
+      - "./data:/storage:ro"
+      - "./data/recordingQueue/:/watch:rw"
+      - "./data/recordings:/output:rw"
