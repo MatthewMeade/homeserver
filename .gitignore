@@ -7,3 +7,7 @@ handbrake/hooks/*
 !handbrake/preset.json
 !handbrake/hooks/
 !handbrake/hooks/pre_conversion.sh
+
+.env
+
+plausable/
