@@ -116,6 +116,22 @@ services:
     ports:
       - 8000:80
 
+  mcmyadmin:
+    image: tekgator/docker-mcmyadmin:2.1.0
+    container_name: mcmyadmin
+    environment:
+      PUID: "${_UID}"
+      PGID: "${_GID}"
+      EULA: 1
+    volumes:
+      - ./data/MC:/data
+    ports:
+      - 8888:8080
+      - 25565:25565
+      - 8123:8123
+    stop_grace_period: 30s
+    restart: unless-stopped
+
 
 volumes:
   db-data:
